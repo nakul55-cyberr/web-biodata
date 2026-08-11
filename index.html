@@ -1,1 +1,384 @@
+<DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biodata Diri</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background: #0d0d12;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: #17171f;
+    border-radius: 24px;
+    border: 1px solid #2a2a35;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+  }
+  .top {
+    padding: 32px 28px 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+  }
+  .top::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 90px;
+    background: radial-gradient(circle at top left, #310aa8, transparent 60%),
+                radial-gradient(circle at top right, #2cb67d, transparent 60%);
+    opacity: 0.25;
+    z-index: 0;
+  }
+  .avatar {
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #7f5af0, #000000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #fff;
+    z-index: 1;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.2s ease;
+  }
+  .avatar:hover { transform: scale(1.03); }
+  .avatar .edit-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 26px;
+    height: 26px;
+    background: #17171f;
+    border: 2px solid #0d0d12;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .avatar input[type="file"] {
+    display: none;
+  }
+  .identity { z-index: 1; }
+  .identity h2 { color: #fff; font-size: 20px; font-weight: 700; }
+  .identity p { color: #7f5af0; font-size: 13px; font-weight: 500; margin-top: 3px; }
+  .body { padding: 6px 28px 28px; }
+  .item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid #24242e;
+  }
+  .item:first-child { border-top: none; }
+  .item .ic {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+    background: #24242e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .item .txt { width: 100%; }
+  .item .txt .lbl {
+    color: #8a8a99;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+  .item .txt .val { color: #e6e6ef; font-size: 14px; line-height: 1.5; }
+  .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #55555f; }
 
+  /* skill interactive (level) */
+  .skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+  .skill-btn {
+    background: #24242e;
+    color: #2cb67d;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #2cb67d33;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .skill-btn:hover { background: #2cb67d22; transform: translateY(-2px); }
+  .skill-btn.active { background: #2cb67d; color: #0d0d12; box-shadow: 0 4px 14px #2cb67d55; }
+
+  .skill-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin-top 0.35s ease;
+    width: 100%;
+  }
+  .skill-detail.open { max-height: 100px; margin-top: 10px; }
+  .skill-detail-box {
+    background: #1e1e28;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .skill-detail-box .name { color: #fff; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .bar-bg { width: 100%; height: 6px; background: #2a2a35; border-radius: 4px; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7f5af0, #2cb67d);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  .bar-pct { color: #8a8a99; font-size: 11px; margin-top: 4px; text-align: right; }
+
+  /* bahasa interactive (penjelasan) */
+  .lang-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+  .lang-btn {
+    background: #24242e;
+    color: #7f5af0;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #7f5af033;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .lang-btn:hover { background: #7f5af022; transform: translateY(-2px); }
+  .lang-btn.active { background: #7f5af0; color: #fff; box-shadow: 0 4px 14px #7f5af055; }
+
+  .lang-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin-top 0.35s ease;
+    width: 100%;
+  }
+  .lang-detail.open { max-height: 160px; margin-top: 10px; }
+  .lang-detail-box {
+    background: #1e1e28;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .lang-detail-box .name { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  .lang-detail-box .desc { color: #b4b4c2; font-size: 12.5px; line-height: 1.6; }
+
+  .footer { text-align: center; padding: 16px; font-size: 11px; color: #55555f; border-top: 1px solid #24242e; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="top">
+    <div class="avatar" id="avatar" >
+      <span id="avatarIcon">👤</span>
+      <div class="edit-badge">📷</div>
+      <input type="file" id="photoInput" accept="https://cdn.phototourl.com/free/2026-08-06-0ec7d74f-56b6-40d6-aca7-b79fa25465e9.jpg/*">
+    </div>
+    <div class="identity">
+      <h2>Nama:Nakula Eka Mintoraharjo</h2>
+      <p>Status:Pelajar SMK</p>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="item">
+      <div class="ic">📍</div>
+      <div class="txt">
+        <div class="lbl">Alamat</div>
+        <div class="val">Gg.Budi No 251 Rt02 Rw 12 Jl.Myjend Ishak Djuarsa</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="ic">🎓</div>
+      <div class="txt">
+        <div class="lbl">Pendidikan</div>
+        <div class="val">Nama Sekolah SMK INFOKOM BOGOR / — Jurusan RPL (2026-2027)</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="ic">⚡</div>
+      <div class="txt">
+        <div class="lbl">Skill <span class="hint">(tap untuk lihat level)</span></div>
+        <div class="skills-wrap" id="skillsWrap"></div>
+        <div class="skill-detail" id="skillDetail">
+          <div class="skill-detail-box">
+            <div class="name" id="detailName">-</div>
+            <div class="bar-bg"><div class="bar-fill" id="detailBar"></div></div>
+            <div class="bar-pct" id="detailPct">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="ic">💻</div>
+      <div class="txt">
+        <div class="lbl">Bahasa <span class="hint">(tap untuk lihat penjelasan)</span></div>
+        <div class="lang-wrap" id="langWrap"></div>
+        <div class="lang-detail" id="langDetail">
+          <div class="lang-detail-box">
+            <div class="name" id="langName">-</div>
+            <div class="desc" id="langDesc">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="ic">✨</div>
+      <div class="txt">
+        <div class="lbl">About Me</div>
+        <div class="val">Saya orangnya santai ✌️ dan selalu antusias buat nyobain hal-hal positif baru 💡. Keseharian saya biasanya nggak jauh dari main game mobile 🎮 atau meluncur ke lapangan buat main bola ⚽. Kalo lagi gabut, palingan saya nyari temen buat main atau sekadar nongkrong bareng ☕👥.
+​Soal warna favorit, saya seneng banget sama kombinasi hitam, biru tua, dan orange 🖤💙🧡. Nah kalo urusan makanan, saya paling gak bisa nolak spaghetti 🍝, ayam goreng 🍗, plus kentang goreng 🍟!</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">Dibuat dengan Nakula Ganteng — tap tag di atas ya</div>
+</div>
+
+<script>
+  // ===== FOTO PROFIL =====
+  const avatar = document.getElementById('avatar');
+  const avatarIcon = document.getElementById('avatarIcon');
+  const photoInput = document.getElementById('photoInput');
+
+  avatar.addEventListener('click', () => photoInput.click());
+
+  photoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      avatar.style.backgroundImage = `url(${ev.target.result})`;
+      avatarIcon.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ===== SKILL (level) =====
+  const skills = [
+    { name: "Skill html", level: 80 },
+    { name: "Skill CSS", level: 70 },
+    { name: "Skill JavaScript", level: 55 },
+    { name: "Skill python", level: 60 }
+  ];
+
+  const skillWrap = document.getElementById('skillsWrap');
+  const skillDetail = document.getElementById('skillDetail');
+  const detailName = document.getElementById('detailName');
+  const detailBar = document.getElementById('detailBar');
+  const detailPct = document.getElementById('detailPct');
+  let activeSkillBtn = null;
+
+  skills.forEach(skill => {
+    const btn = document.createElement('div');
+    btn.className = 'skill-btn';
+    btn.textContent = skill.name;
+    btn.addEventListener('click', () => {
+      const isSame = activeSkillBtn === btn;
+      document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active'));
+
+      if (isSame) {
+        skillDetail.classList.remove('open');
+        detailBar.style.width = '0%';
+        activeSkillBtn = null;
+        return;
+      }
+
+      btn.classList.add('active');
+      activeSkillBtn = btn;
+      detailName.textContent = skill.name;
+      skillDetail.classList.add('open');
+      detailBar.style.width = '0%';
+      detailPct.textContent = '0%';
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          detailBar.style.width = skill.level + '%';
+          detailPct.textContent = skill.level + '%';
+        }, 50);
+      });
+    });
+    skillWrap.appendChild(btn);
+  });
+
+  // ===== BAHASA (penjelasan) =====
+  const languages = [
+    {
+      name: "HTML",
+      desc: "HyperText Markup Language — bahasa dasar untuk membangun struktur dan konten halaman web, seperti judul, paragraf, gambar, dan tautan."
+    },
+    {
+      name: "CSS",
+      desc: "Cascading Style Sheets — digunakan untuk mengatur tampilan visual halaman web: warna, tata letak, jarak, animasi, dan responsivitas."
+    },
+    {
+      name: "JavaScript",
+      desc: "Bahasa pemrograman untuk menambahkan interaktivitas pada halaman web, seperti animasi, validasi form, dan komunikasi dengan server."
+    },
+    {
+      name: "Python",
+      desc: "Bahasa pemrograman serbaguna yang mudah dibaca, sering dipakai untuk backend web, otomatisasi, data science, hingga machine learning."
+    }
+  ];
+
+  const langWrap = document.getElementById('langWrap');
+  const langDetail = document.getElementById('langDetail');
+  const langName = document.getElementById('langName');
+  const langDesc = document.getElementById('langDesc');
+  let activeLangBtn = null;
+
+  languages.forEach(lang => {
+    const btn = document.createElement('div');
+    btn.className = 'lang-btn';
+    btn.textContent = lang.name;
+    btn.addEventListener('click', () => {
+      const isSame = activeLangBtn === btn;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+
+      if (isSame) {
+        langDetail.classList.remove('open');
+        activeLangBtn = null;
+        return;
+      }
+
+      btn.classList.add('active');
+      activeLangBtn = btn;
+      langName.textContent = lang.name;
+      langDesc.textContent = lang.desc;
+      langDetail.classList.add('open');
+    });
+    langWrap.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
